@@ -365,6 +365,34 @@
       opacity: 0;
       transform: translateY(14px);
     }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .triptych-grid,
+      .three-kw-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5em;
+        text-align: center;
+      }
+      .triptych-col, .three-kw-item {
+        align-items: center;
+      }
+
+      .split-grid {
+        grid-template-columns: 1fr;
+        gap: 2em;
+      }
+
+      .keywords-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1em;
+        text-align: center;
+      }
+
+      .text-block p, .quote-text {
+        text-align: center;
+      }
+    }
   </style>
 </head>
 
