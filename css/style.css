@@ -1,0 +1,234 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   NIHIL SINE HORA — Presentazione Tesi di Laurea Magistrale
+   Pierfilippo Rappa / Design Grafico – Comunicazione Visiva / ABA Palermo 2026
+   Font: Syne | Colori: bianco su trasparente
+   Layout pixel-perfect basato su analisi delle tavole originali 8000×4500
+═══════════════════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: 'Syne', sans-serif;
+  color: #fff;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   VIDEO BACKGROUND
+─────────────────────────────────────────────────────────────────────────── */
+.video-bg {
+  position: fixed; inset: 0; z-index: 0; overflow: hidden;
+}
+.video-bg video {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   SLIDES WRAPPER
+─────────────────────────────────────────────────────────────────────────── */
+.slides-wrapper { position: fixed; inset: 0; z-index: 1; }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   SINGOLA SLIDE
+   Margine sinistro/destro misurato: ~10.4% / ~89.5% → pad 10.5%
+   Contenuto superiore inizia a ~18.4% → pad-top ~18.4vh
+─────────────────────────────────────────────────────────────────────────── */
+.slide {
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   CROSSHAIR – mirini agli 4 angoli
+   Posizioni misurate: TL: x≈10.5% y≈18.7%  TR: x≈89.5% y≈18.7%
+                       BL: x≈10.5% y≈79.3%  BR: x≈89.5% y≈79.3%
+─────────────────────────────────────────────────────────────────────────── */
+.ch {
+  position: absolute;
+  width: 2.2vw; height: 2.2vw;
+  pointer-events: none;
+}
+.ch::before, .ch::after {
+  content: ''; position: absolute; background: #fff;
+}
+.ch::before { width: 100%; height: 1px; top: 50%; left: 0; transform: translateY(-50%); }
+.ch::after  { width: 1px; height: 100%; left: 50%; top: 0; transform: translateX(-50%); }
+
+.ch-tl { top: 18.2vh; left: 10.4vw; transform: translate(-50%, -50%); }
+.ch-tr { top: 18.2vh; right: 10.4vw; transform: translate(50%, -50%); }
+.ch-bl { bottom: 19.7vh; left: 10.4vw; transform: translate(-50%, 50%); }
+.ch-br { bottom: 19.7vh; right: 10.4vw; transform: translate(50%, 50%); }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   HEADER LABEL – centrato, y≈18.4–21.8%  → top: 18.4vh, h: 3.4vh
+   Font misurato: ~1.1vh (piccolo, tracking largo, peso 700)
+─────────────────────────────────────────────────────────────────────────── */
+.s-header {
+  position: absolute;
+  top: 18.4vh; left: 0; right: 0;
+  height: 3.4vh;
+  display: flex; align-items: center; justify-content: center;
+}
+.s-header span {
+  font-size: clamp(0.55rem, 0.95vh, 0.9rem);
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   FOOTER LABEL – centrato, y≈78.2–81.3% → bottom ≈ 18.7vh
+─────────────────────────────────────────────────────────────────────────── */
+.s-footer {
+  position: absolute;
+  bottom: 18.7vh; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.s-footer span {
+  font-size: clamp(0.55rem, 0.95vh, 0.9rem);
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLIDE 01 & 16 — COVER / GRAZIE
+   Struttura:
+     header: top=18.4vh, centrato
+     eyebrow: top≈42.1vh centrato, h≈0.9vh → font ~1.25vh
+     titolo: top≈44.3vh centrato, h≈4.9vh → font: 4.9/0.72 ≈ 6.8vh
+     sottotitolo: top≈51.0vh centrato, h≈2.2vh → font ~3vh
+     footer: bottom≈18.7vh
+═══════════════════════════════════════════════════════════════════════════ */
+.cover-eyebrow {
+  position: absolute;
+  top: 42.1vh; left: 0; right: 0;
+  text-align: center;
+  font-size: clamp(0.6rem, 1.2vh, 1rem);
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.cover-title {
+  position: absolute;
+  top: 44.3vh; left: 0; right: 0;
+  text-align: center;
+  font-size: clamp(3rem, 6.8vh, 9rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #fff;
+}
+.cover-sub {
+  position: absolute;
+  top: 51vh; left: 0; right: 0;
+  text-align: center;
+  font-size: clamp(1rem, 2.5vh, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLIDE 02 — INCIPIT (citazione Agostino)
+   header: top=18.4vh, LEFT (x=10.4%)  ← header sinistra su questa slide!
+   quote: top≈34.7vh, x=10.5%, w≈70%, h≈14.9vh (3 parti fuse)
+     riga1: y=34.7-39.3% h=4.6% → font ~6.4vh  (testo gigante)
+     riga2: y=41.0-44.6% → h=3.6%
+     riga3: y=46.6-49.6% → h=3.0%
+     riga4: y=52.2-55.8% → h=3.6%
+   cite: y≈61-65%, centrato x≈40-60%
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLIDE 03 — LE DOMANDE
+   header: centrato
+   blocchi centrati:
+     [2] y=29.9-32.8% h=2.9% → 1 riga
+     [3] y=34.3-37.6% h=3.3% → 1 riga
+     [4] y=39.4-42.1% h=2.7%
+     [5] y=43.2-46.1% h=2.9%  ← queste 4 sono il primo paragrafo
+     [6] y=52.1-55.0% h=2.9%
+     [7] y=57.2-59.8% h=2.7%
+     [8] y=61.6-64.3% h=2.7%
+     [9] y=65.9-68.3% h=2.4%  ← queste 4 sono il secondo paragrafo
+   Contenuto centrato orizzontalmente (vedi x_start/x_end simmetrici)
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLIDE 04 — IL PERCORSO (3 colonne)
+   header centrato
+   titolo cover: y=36.3-42.2% h=5.9% → font ~8.2vh  x=10.8-75.7%
+   3 items: y≈44-64%, x=10.5% start (tutti left-aligned)
+     [3] y=44.1-47.8% h=3.8%
+     [4] y=49.6-53.4% h=3.8%
+     [5] y=55.2-59.0% h=3.8%
+     [6] y=60.7-64.5% h=3.8%
+   NOTA: slide 05 analisi colonne mostra range x=13.75-78.5% per tutto
+   Guardando l'immagine: "IL PERCORSO" header centrato
+   Tre colonne: 01. STORIA DELLA MISURAZIONE (x≈10%), 02. PERCE ZIONE DEL TEMPO (x≈37%), 03. ANIMA MISURARE IL KAIROS (x≈64%)
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TIPOGRAFIA BODY — slide di testo (05,06,07,08,10,12,13,14,15)
+   Ogni riga di body h≈2.2-2.9% su 100vh = 2.2-2.9vh
+   Font cap-height Syne800 ≈ 0.72 → font-size = 2.2/0.72 ≈ 3.05vh
+   Margine sinistro: x≈13.8% → left: 13.8vw
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* Testo body standard: left-aligned, partenza y variabile per slide */
+.body-text {
+  position: absolute;
+  left: 13.8vw;
+  right: 10.5vw;
+  font-size: clamp(0.9rem, 3.0vh, 3.2rem);
+  font-weight: 800;
+  letter-spacing: 0.005em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   NAV + PROGRESS
+─────────────────────────────────────────────────────────────────────────── */
+.nav-arrows {
+  position: fixed; bottom: 3vh; left: 50%; transform: translateX(-50%);
+  z-index: 10; display: flex; align-items: center; gap: 1.2rem;
+  background: rgba(0,0,0,0.4); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.15); border-radius: 3rem;
+  padding: 0.45rem 1.2rem;
+}
+.nav-btn {
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0.35rem; border-radius: 50%;
+  transition: background 0.2s;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.15); }
+.slide-counter {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 0.12em; color: #fff;
+  min-width: 4rem; text-align: center;
+}
+.progress-bar {
+  position: fixed; bottom: 0; left: 0; height: 2px;
+  background: rgba(255,255,255,0.85); z-index: 10;
+  transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide, .progress-bar { transition: none; }
+}

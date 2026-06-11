@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nihil Sine Hora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      font-family: 'Barlow Condensed', sans-serif;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    /* ── VIDEO BACKGROUND ── */
+    .video-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .video-bg video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── SLIDES WRAPPER (schermo intero) ── */
+    .deck {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 80%;
+      height: 80%;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.55s ease;
+      overflow: hidden;
+      margin: 10vh auto;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── CROCINI DI REGISTRO (bianchi) ── */
+    .corners {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .corner {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+    }
+
+    .corner::before,
+    .corner::after {
+      content: '';
+      position: absolute;
+      background: #fff;
+    }
+
+    .corner::before {
+      width: 1px;
+      height: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0.6;
+    }
+
+    .corner::after {
+      width: 100%;
+      height: 1px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.6;
+    }
+
+    .corner .c-ring {
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+    }
+
+    .corner--tl {
+      top: 28px;
+      left: 28px;
+    }
+
+    .corner--tr {
+      top: 28px;
+      right: 28px;
+    }
+
+    .corner--bl {
+      bottom: 28px;
+      left: 28px;
+    }
+
+    .corner--br {
+      bottom: 28px;
+      right: 28px;
+    }
+
+    /* ── HEADER / FOOTER ── */
+    .slide-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 11;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 28px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(9px, 1vw, 13px);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .slide-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 11;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 28px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(9px, 0.9vw, 12px);
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      position: relative;
+      z-index: 5;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 7% 80px 7%;
+    }
+
+    .slide--cover .content,
+    .slide--closing .content {
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+    }
+
+    /* ── COVER & CLOSING ── */
+    .cover-label {
+      font-size: clamp(9px, 0.9vw, 12px);
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 0.5em;
+    }
+
+    .cover-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(50px, 8.5vw, 115px);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      line-height: 0.9;
+      color: #fff;
+      margin-bottom: 0.3em;
+    }
+
+    .cover-subtitle {
+      font-size: clamp(11px, 1.2vw, 16px);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 1.5;
+    }
+
+    /* ── TEXT ── */
+    .text-block {
+      margin-bottom: 1.8em;
+      max-width: 820px;
+    }
+
+    .text-block:last-child {
+      margin-bottom: 0;
+    }
+
+    .text-block p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(22px, 3.1vw, 46px);
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 1.05;
+      color: #fff;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── QUOTE ── */
+    .quote-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(24px, 3.5vw, 52px);
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 1.05;
+      color: #fff;
+      max-width: 820px;
+      margin-bottom: 0.8em;
+    }
+
+    .quote-source {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(10px, 1.1vw, 14px);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #fff;
+      text-align: center;
+    }
+
+    /* ── TRIPTYCH ── */
+    .triptych-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      width: 100%;
+    }
+
+    .triptych-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .triptych-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(28px, 4.2vw, 62px);
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1;
+      color: #fff;
+      margin-bottom: 0.15em;
+    }
+
+    .triptych-word {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(26px, 4vw, 58px);
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 0.95;
+      color: #fff;
+    }
+
+    /* ── SPLIT ── */
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4%;
+      width: 100%;
+    }
+
+    .split-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .split-word {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(38px, 6.2vw, 92px);
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 0.9;
+      color: #fff;
+      margin-bottom: 0.2em;
+    }
+
+    .split-desc {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(15px, 2.1vw, 30px);
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    /* ── KEYWORDS ── */
+    .keywords-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0 1%;
+      width: 100%;
+      align-items: start;
+    }
+
+    .kw-item {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(16px, 2.3vw, 36px);
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1.0;
+      color: #fff;
+    }
+
+    /* ── THREE KW ── */
+    .three-kw-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0 3%;
+      width: 100%;
+      align-items: start;
+    }
+
+    .three-kw-item {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(24px, 3.8vw, 58px);
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1.0;
+      color: #fff;
+    }
+
+    /* ── REVEAL ANIMATION ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- VIDEO BACKGROUND — costante, mai interrotto -->
+  <div class="video-bg">
+    <video autoplay muted loop playsinline>
+      <source src="media/background.mp4" type="video/mp4">
+      <source src="media/background.webm" type="video/webm">
+    </video>
+  </div>
+
+  <div class="deck">
+
+    <!-- 01 COVER -->
+    <div class="slide slide--cover active" data-slide="1">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">PIERFILIPPO RAPPA / DESIGN GRAFICO – COMUNICAZIONE VISIVA</div>
+      <div class="content">
+        <div class="cover-label reveal">TESI DI LAUREA MAGISTRALE</div>
+        <div class="cover-title reveal">NIHIL SINE HORA</div>
+        <div class="cover-subtitle reveal">GENEALOGIA E PERCEZIONE DI UN CONCETTO GABBIA</div>
+      </div>
+      <div class="slide-footer reveal">PROF FAUSTO GRISTINA | GIULIO ADELFIO – ABA PALERMO 2026</div>
+    </div>
+
+    <!-- 02 INCIPIT -->
+    <div class="slide slide--quote" data-slide="2">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">INCIPIT</div>
+      <div class="content">
+        <div class="quote-text reveal">"CHE COS'È QUINDI IL TEMPO?<br>SE NESSUNO ME LO CHIEDE, LO SO;<br>SE DOVESSI
+          SPIEGARLO A CHI ME LO<br>CHIEDE, NON LO SO."</div>
+        <div class="quote-source reveal">AGOSTINO D'IPPONA,<br>CONFESSIONI, XI, 14</div>
+      </div>
+    </div>
+
+    <!-- 03 LE DOMANDE -->
+    <div class="slide slide--text" data-slide="3">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">LE DOMANDE</div>
+      <div class="content">
+        <div class="text-block reveal">
+          <p>PERCHÉ L'ESSERE UMANO HA SENTITO LA<br>NECESSITÀ DI OGGETTIVARE UN CONCETTO CHE,<br>ESSENDO FRUTTO DELLA
+            PERCEZIONE,<br>È PURAMENTE SOGGETTIVO?</p>
+        </div>
+        <div class="text-block reveal">
+          <p>PERCHÉ ABBIAMO INIZIATO A MISURARE IL TEMPO CON SEMPRE MAGGIORE PRECISIONE, FINO NON SOLO A
+            CONTROLLARLO, MA ANCHE A ESSERNE SCHIAVI?</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 IL PERCORSO -->
+    <div class="slide slide--triptych" data-slide="4">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">IL PERCORSO</div>
+      <div class="content">
+        <div class="triptych-grid">
+          <div class="triptych-col reveal">
+            <div class="triptych-num">01.</div>
+            <div class="triptych-word">STORIA DELLA<br>MISURAZIONE</div>
+          </div>
+          <div class="triptych-col reveal">
+            <div class="triptych-num">02.</div>
+            <div class="triptych-word">PERCEZIONE<br>DEL TEMPO</div>
+          </div>
+          <div class="triptych-col reveal">
+            <div class="triptych-num">03.</div>
+            <div class="triptych-word">ANIMA<br>MISURARE<br>IL KAIROS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 01 | TEMPUS FUGIT storia -->
+    <div class="slide slide--text" data-slide="5">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">01 | TEMPUS FUGIT</div>
+      <div class="content">
+        <div class="text-block reveal">
+          <p>IL TEMPO VIENE DA SEMPRE MISURATO<br>TRAMITE I RIFERIMENTI DELLA NATURA:<br>IL CIELO E I RITUALI.</p>
+        </div>
+        <div class="text-block reveal">
+          <p>I PRIMI STRUMENTI RUDIMENTALI SONO LO<br>GNOMONE E LA CLESSIDRA – SFRUTTANO<br>ANCORA LA NATURA.</p>
+        </div>
+        <div class="text-block reveal">
+          <p>SOLO IN ULTIMO LA MISURAZIONE DIVIENE<br>DISCIPLINA.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 CHRONOS vs KAIROS -->
+    <div class="slide slide--split" data-slide="6">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">01 | TEMPUS FUGIT</div>
+      <div class="content">
+        <div class="split-grid">
+          <div class="split-col reveal">
+            <div class="split-word">CHRONOS</div>
+            <div class="split-desc">IL TEMPO QUANTITATIVO,<br>MISURABILE</div>
+          </div>
+          <div class="split-col reveal">
+            <div class="split-word">KAIROS</div>
+            <div class="split-desc">IL TEMPO QUALITATIVO,<br>MOMENTO IDEALE,<br>SIMBOLICO</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 scappamento -->
+    <div class="slide slide--text" data-slide="7">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">01 | TEMPUS FUGIT</div>
+      <div class="content">
+        <div class="text-block reveal">
+          <p>CON LO SCAPPAMENTO IL TEMPO DIVENTA<br>PUBBLICO, CONDIVISO, NORMATIVO.</p>
+        </div>
+        <div class="text-block reveal">
+          <p>IL TEMPO NON È PIÙ ECCLESIASTICO<br>MA MERCANTILE.</p>
+        </div>
+        <div class="text-block reveal">
+          <p>NON PIÙ TEMPO COME RIFERIMENTO<br> MA COME CONTROLLO.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 08 02 | KAIROS CONTRO CHRONOS -->
+    <div class="slide slide--text" data-slide="8">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">02 | KAIROS CONTRO CHRONOS</div>
+      <div class="content">
+        <div class="text-block reveal">
+          <p>BERGSON, HUSSERL E HEIDEGGER MOSTRANO<br>CHE IL TEMPO VISSUTO NON COMBACIA<br> CON QUELLO DELL'OROLOGIO.
+          </p>
+        </div>
+        <div class="text-block reveal">
+          <p>ROSA PARLA DI PENURIA DEL TEMPO<br>COMEPATOLOGIA DELLA SOCIETÀ.</p>
+        </div>
+        <div class="text-block reveal">
+          <p>L'ESPERIMENTO TIMIUM DIMOSTRA CHE<br>IL CAMBIO DI PROSPETTIVA È POSSIBILE.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 09 03 | ANIMA 3kw -->
+    <div class="slide slide--3kw" data-slide="9">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">03 | ANIMA</div>
+      <div class="content">
+        <div class="three-kw-grid">
+          <div class="three-kw-item reveal">"NON HO<br>TEMPO"</div>
+          <div class="three-kw-item reveal">UN<br>DEVICE<br>VISUALE</div>
+          <div class="three-kw-item reveal">NON<br>QUANTO<br>MA<br>QUANDO</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10 03 | ANIMA keywords -->
+    <div class="slide slide--keywords" data-slide="10">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">03 | ANIMA</div>
+      <div class="content">
+        <div class="keywords-grid">
+          <div class="kw-item reveal">METEO</div>
+          <div class="kw-item reveal">RITMO<br>CIRCADIANO</div>
+          <div class="kw-item reveal">POLLINE</div>
+          <div class="kw-item reveal">ORE DI<br>SOLE</div>
+          <div class="kw-item reveal">SPAZI<br>VERDI</div>
+          <div class="kw-item reveal">INDICE<br>UV</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11 03 | ANIMA dati -->
+    <div class="slide slide--text" data-slide="11">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">03 | ANIMA</div>
+      <div class="content">
+        <div class="text-block reveal">
+          <p>I DATI VENGONO PRIMA NORMALIZZATI IN<br>RANGE NUMERICI.</p>
+        </div>
+        <div class="text-block reveal">
+          <p>OGNI DATO COLLEGATO A UN "BLOB"<br>CROMATICO – IN BASE AL VALORE NUMERICO<br>IL BLOB VARIA IL COLORE.</p>
+        </div>
+        <div class="text-block reveal">
+          <p>SFRUTTANDO LA COSCIENZA COMUNE,<br>DAL ROSSO AL VERDE PER QUALITÀ CRESCENTE.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12 03 | ANIMA blob esagono -->
+    <div class="slide slide--text" data-slide="12">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">03 | ANIMA</div>
+      <div class="content">
+        <div class="text-block reveal">
+          <p>I BLOB SONO POI DISPOSTI FUORI DAL FRAME<br> A FORMA DI ESAGONO, CREANDO MOVIMENTI<br>DI FLUTTUAZIONE
+            ORGANICA DA CUI<br>IL PROGETTO PRENDE IL SUO NOME.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 13 03 | ANIMA orologio -->
+    <div class="slide slide--text" data-slide="13">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">03 | ANIMA</div>
+      <div class="content">
+        <div class="text-block reveal">
+          <p>AL CAMPO CROMATICO VI È SOVRAPPOSTO UN<br>OROLOGIO CHRONOLOGICO CHE MISURA<br>IL TEMPO IN MODO OSTILE.</p>
+        </div>
+        <div class="text-block reveal">
+          <p>PER SCELTA PROGETTUALE, RESTITUISCE<br>UNA MISURAZIONE IMPRECISA DEL TEMPO<br>E RICHIEDE IMPEGNO ATTIVO DA
+            PARTE<br>DELL'UTENTE PER ESSERE COMPRESO.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14 03 | ANIMA soggetto -->
+    <div class="slide slide--text" data-slide="14">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">03 | ANIMA</div>
+      <div class="content">
+        <div class="text-block reveal">
+          <p>IL SOGGETTO È INFLUENZATO DALL'AMBIENTE<br>CHE VIVE – IL POSTO IN CUI SEI CAMBIA<br>LA QUALITÀ DI QUELLO
+            CHE VIVI.</p>
+        </div>
+        <div class="text-block reveal">
+          <p>AVER RESTITUITO IL FEEDBACK VISIVO<br>DEL MOMENTO CHE IL SOGGETTO STA VIVENDO.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15 EODEM REVERTIMUR -->
+    <div class="slide slide--text" data-slide="15">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">EODEM REVERTIMUR</div>
+      <div class="content">
+        <div class="text-block reveal">
+          <p>IL PROGETTO NON SERVE A ELIMINARE<br>IL PROBLEMA DELL'OGGETTIVAZIONE<br>DEL TEMPO: UNA QUESTIONE <br>CHE
+            NON
+            VERRÀ MAI RISOLTA.</p>
+        </div>
+        <div class="text-block reveal">
+          <p>METTE IN RISALTO LA CONTRAPPOSIZIONE<br>TRA LE DUE UNITÀ DI MISURA NON COINCIDENTI.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 16 CLOSING -->
+    <div class="slide slide--closing" data-slide="16">
+      <div class="corners">
+        <div class="corner corner--tl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--tr">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--bl">
+          <div class="c-ring"></div>
+        </div>
+        <div class="corner corner--br">
+          <div class="c-ring"></div>
+        </div>
+      </div>
+      <div class="slide-header reveal">PIERFILIPPO RAPPA / DESIGN GRAFICO – COMUNICAZIONE VISIVA</div>
+      <div class="content">
+        <div class="cover-label reveal">TESI DI LAUREA MAGISTRALE</div>
+        <div class="cover-title reveal">GRAZIE</div>
+        <div class="cover-subtitle reveal">È TUTTO ;)</div>
+      </div>
+      <div class="slide-footer reveal">PROF FAUSTO GRISTINA | GIULIO ADELFIO – ABA PALERMO 2026</div>
+    </div>
+
+  </div><!-- /deck -->
+
+  <script>
+    (function () {
+      const slides = document.querySelectorAll('.slide');
+      const total = slides.length;
+      let current = 0;
+      let busy = false;
+
+      function go(idx) {
+        if (busy) return;
+        busy = true;
+        slides[current].classList.remove('active');
+        current = ((idx % total) + total) % total;
+        slides[current].classList.add('active');
+        animateSlide(slides[current]);
+        setTimeout(() => { busy = false; }, 600);
+      }
+
+      /* ── Schermo Intero ── */
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(err => {
+            console.error(`Errore attivando lo schermo intero: ${err.message}`);
+          });
+        } else {
+          document.exitFullscreen().catch(err => {
+            console.error(`Errore disattivando lo schermo intero: ${err.message}`);
+          });
+        }
+      }
+
+      /* ── Click / Tap (Avanza) & Doppio Click / Tap (Fullscreen) ── */
+      let clickTimer = null;
+      document.addEventListener('click', e => {
+        // Ignora elementi interattivi
+        if (e.target.closest('button, a, input, textarea, select')) return;
+
+        if (clickTimer) {
+          clearTimeout(clickTimer);
+          clickTimer = null;
+          toggleFullscreen();
+        } else {
+          clickTimer = setTimeout(() => {
+            clickTimer = null;
+            go(current + 1);
+          }, 250);
+        }
+      });
+
+      /* ── Tastiera ── */
+      document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+          e.preventDefault(); go(current + 1);
+        }
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault(); go(current - 1);
+        }
+        if (e.key === 'Escape' || e.key === 'Esc') {
+          if (document.fullscreenElement) {
+            document.exitFullscreen().catch(err => {});
+          }
+        }
+      });
+
+      /* ── Scroll (wheel) ── */
+      let wheelCooldown = false;
+      document.addEventListener('wheel', e => {
+        if (wheelCooldown) return;
+        wheelCooldown = true;
+        go(e.deltaY > 0 ? current + 1 : current - 1);
+        setTimeout(() => { wheelCooldown = false; }, 700);
+      }, { passive: true });
+
+      /* ── Touch / swipe ── */
+      let tx = 0, ty = 0;
+      document.addEventListener('touchstart', e => {
+        tx = e.touches[0].clientX;
+        ty = e.touches[0].clientY;
+      }, { passive: true });
+      document.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - tx;
+        const dy = e.changedTouches[0].clientY - ty;
+        if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 45) {
+          go(dy < 0 ? current + 1 : current - 1);
+        } else if (Math.abs(dx) > 45) {
+          go(dx < 0 ? current + 1 : current - 1);
+        }
+      }, { passive: true });
+
+      /* ── Animazione reveal ── */
+      function animateSlide(slide) {
+        slide.querySelectorAll('.reveal').forEach((el, i) => {
+          el.style.transition = 'none';
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(14px)';
+          el.offsetHeight; // reflow
+          const delay = i * 0.07;
+          el.style.transition = `opacity 0.4s ease ${delay}s, transform 0.4s ease ${delay}s`;
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        });
+      }
+
+      animateSlide(slides[0]);
+    })();
+  </script>
+
+</body>
+
+</html>
